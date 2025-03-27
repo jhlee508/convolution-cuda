@@ -93,6 +93,9 @@ static void parse_opt(int argc, char **argv) {
   }
 
   printf("================== Convolution Benchmark ==================\n");
+  printf("- Number of iterations: %lu\n", num_iterations);
+  printf("- Print tensor: %s\n", print ? "on" : "off");
+  printf("- Validation: %s\n", validation ? "on" : "off");
   printf("- Convolution Type: %s\n", convolution_type_string[T]);
   printf("- Problem size: \n"
       "  -> Input (N, C, H, W) = (%d, %d, %d, %d)\n"
@@ -103,9 +106,18 @@ static void parse_opt(int argc, char **argv) {
       "  -> Stride (stride_h, stride_w) = (%d, %d)\n"
       "  -> Dilation (dilation_h, dilation_w) = (%d, %d)\n",
       pad_h, pad_w, stride_h, stride_w, dilation_h, dilation_w);
-  printf("- Number of iterations: %lu\n", num_iterations);
-  printf("- Print tensor: %s\n", print ? "on" : "off");
-  printf("- Validation: %s\n", validation ? "on" : "off");
+  unsigned long long int FLOPS = 2ULL * N * K * H * W * C * R * S;
+  unsigned long long int BYTES = (1ULL * (N * C * H * W) + 
+                                  1ULL * (K * C * R * S) + 
+                                  1ULL * (N * K * H * W)) * sizeof(float);
+  unsigned long long int ELEMS = 1ULL * (N * C * H * W) + 
+                                  1ULL * (K * C * R * S) + 
+                                  1ULL * (N * K * H * W);
+  printf("- Number of FLOPs: %llu\n", FLOPS);
+  printf("- Number of BYTEs: %llu\n", BYTES);
+  printf("- Number of ELEMs: %llu\n", ELEMS);
+  printf("- FLOPs/BYTE: %.2f\n", (double)FLOPS / BYTES);
+  printf("- FLOPs/ELEM: %.2f\n", (double)FLOPS / ELEMS);
 }
 
 int main(int argc, char **argv) {
