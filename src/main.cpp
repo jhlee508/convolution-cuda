@@ -99,25 +99,34 @@ static void parse_opt(int argc, char **argv) {
   printf("- Convolution Type: %s\n", convolution_type_string[T]);
   printf("- Problem size: \n"
       "  -> Input (N, C, H, W) = (%d, %d, %d, %d)\n"
-      "  -> Filter (K, R, S) = (%d, %d, %d)\n",
-      N, C, H, W, K, R, S);
+      "  -> Filter (K, C, R, S) = (%d, %d, %d, %d)\n"
+      "  -> Output (ON, OC, OH, OW) = (%d, %d, %d, %d)\n",
+      N, C, H, W, K, C, R, S,
+      N, K, 1 + (H + 2 * pad_h - (((R - 1) * dilation_h) + 1)) / stride_h,
+      1 + (W + 2 * pad_w - (((S - 1) * dilation_w) + 1)) / stride_w);
   printf(
       "  -> Padding (pad_h, pad_w) = (%d, %d)\n"
       "  -> Stride (stride_h, stride_w) = (%d, %d)\n"
       "  -> Dilation (dilation_h, dilation_w) = (%d, %d)\n",
       pad_h, pad_w, stride_h, stride_w, dilation_h, dilation_w);
-  unsigned long long int FLOPS = 2ULL * N * K * H * W * C * R * S;
+
+  const int ON = N;
+  const int OC = K;
+  const int OH = 1 + (H + 2 * pad_h - (((R - 1) * dilation_h) + 1)) / stride_h;
+  const int OW = 1 + (W + 2 * pad_w - (((S - 1) * dilation_w) + 1)) / stride_w;
+  unsigned long long int FLOPS = 2ULL * ON * OC * OH * OW * C * R * S;
   unsigned long long int BYTES = (1ULL * (N * C * H * W) + 
                                   1ULL * (K * C * R * S) + 
-                                  1ULL * (N * K * H * W)) * sizeof(float);
+                                  1ULL * (ON * OC * OH * OW)) * sizeof(float);
   unsigned long long int ELEMS = 1ULL * (N * C * H * W) + 
                                   1ULL * (K * C * R * S) + 
-                                  1ULL * (N * K * H * W);
+                                  1ULL * (ON * OC * OH * OW);
   printf("- Number of FLOPs: %llu\n", FLOPS);
   printf("- Number of BYTEs: %llu\n", BYTES);
   printf("- Number of ELEMs: %llu\n", ELEMS);
   printf("- FLOPs/BYTE: %.2f\n", (double)FLOPS / BYTES);
   printf("- FLOPs/ELEM: %.2f\n", (double)FLOPS / ELEMS);
+  printf("\n");
 }
 
 int main(int argc, char **argv) {
