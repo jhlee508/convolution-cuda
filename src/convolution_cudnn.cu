@@ -63,6 +63,9 @@ void convolution_cudnn_initialize(int N, int C, int H, int W, int K, int R,
   CHECK_CUDNN(cudnnSetTensor4dDescriptor(output_desc, CUDNN_TENSOR_NCHW,
                                          CUDNN_DATA_FLOAT, ON, OC, OH, OW));
 
+  /* Enable TC if available */
+  CHECK_CUDNN(cudnnSetConvolutionMathType(conv_desc, CUDNN_TENSOR_OP_MATH));
+
   int max_algo_count;
   CHECK_CUDNN(
       cudnnGetConvolutionForwardAlgorithmMaxCount(handle, &max_algo_count));
@@ -73,10 +76,20 @@ void convolution_cudnn_initialize(int N, int C, int H, int W, int K, int R,
       handle, input_desc, filter_desc, conv_desc, output_desc, max_algo_count,
       &returned_algo_count, algo_perfs));
 
+  printf("%-50s %-12s %-15s %-28s %-25s\n",
+    "Algorithm", "Time (sec)", "Memory (bytes)", "Status", "MathType");
+  printf("------------------------------------------------------------------");
+  printf("------------------------------------------------------------------\n");
+ 
   for (int i = 0; i < returned_algo_count; ++i) {
-    printf("Algorithm %d: name %s, time %f sec, memory %lu byte, status %s\n",
-           i, algo_to_string(algo_perfs[i].algo), algo_perfs[i].time,
-           algo_perfs[i].memory, cudnnGetErrorString(algo_perfs[i].status));
+    printf("%-50s %-12.6f %-15lu %-28s %-25s\n", 
+      algo_to_string(algo_perfs[i].algo),
+      algo_perfs[i].time,
+      algo_perfs[i].memory,
+      cudnnGetErrorString(algo_perfs[i].status),
+      algo_perfs[i].mathType == CUDNN_TENSOR_OP_MATH
+        ? "CUDNN_TENSOR_OP_MATH"
+        : "CUDNN_DEFAULT_MATH");
   }
 
   best_algo = algo_perfs[0];
