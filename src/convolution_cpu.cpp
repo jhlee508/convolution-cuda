@@ -18,7 +18,9 @@ void convolution_cpu(float *I, float *F, float *O, int N, int C, int H, int W,
   const int OC = K;
   const int OH = 1 + (H + 2 * pad_h - (((R - 1) * dilation_h) + 1)) / stride_h;
   const int OW = 1 + (W + 2 * pad_w - (((S - 1) * dilation_w) + 1)) / stride_w;
+  
   for (int on = 0; on < ON; ++on) {
+#pragma omp parallel for
     for (int oc = 0; oc < OC; ++oc) {
       for (int oh = 0; oh < OH; ++oh) {
         for (int ow = 0; ow < OW; ++ow) {

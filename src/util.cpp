@@ -57,8 +57,8 @@ void check_convolution(float *I, float *F, float *O, int N, int C, int H, int W,
   alloc_tensor(&O_ans, ON, OC, OH, OW);
   zero_tensor(O_ans, ON, OC, OH, OW);
 
-#pragma omp parallel for
   for (int on = 0; on < ON; ++on) {
+#pragma omp parallel for
     for (int oc = 0; oc < OC; ++oc) {
       for (int oh = 0; oh < OH; ++oh) {
         for (int ow = 0; ow < OW; ++ow) {
