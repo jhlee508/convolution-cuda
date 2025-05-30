@@ -93,11 +93,12 @@ void convolution_cudnn_initialize(int N, int C, int H, int W, int K, int R,
   }
 
   best_algo = algo_perfs[0];
+  printf("Using algorithm: %s\n", algo_to_string(best_algo.algo));
 
   CHECK_CUDA(cudaMalloc(&I_gpu, N * C * H * W * sizeof(float)));
   CHECK_CUDA(cudaMalloc(&F_gpu, K * C * R * S * sizeof(float)));
   CHECK_CUDA(cudaMalloc(&O_gpu, ON * OC * OH * OW * sizeof(float)));
-  CHECK_CUDA(cudaMalloc(&workspace, algo_perfs[0].memory));
+  CHECK_CUDA(cudaMalloc(&workspace, best_algo.memory));
 }
 
 void convolution_cudnn(float *I, float *F, float *O, int N, int C, int H, int W,
