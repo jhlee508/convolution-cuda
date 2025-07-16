@@ -77,7 +77,7 @@ void convolution_cudnn_initialize(int N, int C, int H, int W, int K, int R,
       &returned_algo_count, algo_perfs));
 
   printf("%-50s %-12s %-15s %-28s %-25s\n",
-    "Algorithm", "Time (sec)", "Memory (bytes)", "Status", "MathType");
+    "Algorithm", "Time (ms)", "Memory (bytes)", "Status", "MathType");
   printf("------------------------------------------------------------------");
   printf("------------------------------------------------------------------\n");
  
