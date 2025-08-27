@@ -6,7 +6,7 @@ CPPFLAGS=-std=c++14 -O3 -Wall -march=native -mavx2 -mfma -fopenmp -mno-avx512f $
 CUDA_CFLAGS:=$(foreach option, $(CPPFLAGS),-Xcompiler=$(option))
 
 LDFLAGS=-L/usr/local/cuda/lib64
-LDLIBS=-lstdc++ -lcudart -lm -lcudnn
+LDLIBS=-lstdc++ -lcudart -lm -lcudnn -lcublas
 
 CXX=g++
 CUX=/usr/local/cuda/bin/nvcc

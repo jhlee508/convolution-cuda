@@ -11,18 +11,18 @@ dilation_h=1
 dilation_w=1
 
 #########################################################
-Device=2 # (0 for CPU, 1 for GPU, 2 for cuDNN)
+Device=1 # (0 for CPU, 1 for GPU, 2 for cuDNN)
 N=1
-C=1
-H=$((16384))
-W=$((16384))
-K=1
-R=61
-S=61
+C=128
+H=$((160))
+W=$((160))
+K=256
+R=3
+S=3
 #########################################################
 
 srun -N 1 --partition PV --exclusive --gres=gpu:1 \
-  ./main $@ -n 5 \
+  ./main $@ -n 10 \
   $Device \
   $N $C $H $W \
   $K $R $S \
